@@ -11,7 +11,9 @@ This document describes intended data entities and storage layout. No database o
 | `data/raw/` | Source downloads, broker exports, unmodified feeds | Structure only (`.gitkeep`); files gitignored |
 | `data/processed/` | Cleaned OHLCV, derived features, analysis outputs | Structure only; files gitignored |
 
-See [data/README.md](../data/README.md) for usage conventions.
+See [data/README.md](../data/README.md) for usage conventions and the current Dukascopy EUR/USD M15 bid sample.
+
+CSV ingestion (Phase 1) reads unmodified files from `data/raw/` via `load_ohlc_csv` in `backend/app/data/`. It does not write `data/processed/` yet.
 
 ## Conceptual Entities
 
@@ -21,11 +23,13 @@ These entities support the domain model and will inform future schema design. Fi
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `timestamp` | datetime | Bar open or close time (TBD) |
-| `open`, `high`, `low`, `close` | decimal | Price |
-| `volume` | decimal | Optional |
-| `timeframe` | string | e.g. `15m`, `1h`, `4h` |
-| `instrument` | string | e.g. `EUR_USD` |
+| `timestamp` | datetime | Source Unix epoch **milliseconds** converted to timezone-aware UTC. The loader does not reinterpret the value as bar open vs close. |
+| `open`, `high`, `low`, `close` | numeric | Parsed from CSV; must be finite and satisfy OHLC bounds |
+| `volume` | decimal | Optional in the conceptual model. **Absent** from the current bid sample; not invented during ingestion |
+| `timeframe` | string | e.g. `15m`, `1h`, `4h`. Not stored on candle records; optional alignment uses an explicit caller-supplied timeframe |
+| `instrument` | string | e.g. `EUR_USD`. Not stored on candle records |
+
+The current raw CSV schema is exactly `timestamp,open,high,low,close`. That series is Dukascopy EUR/USD 15-minute **bid** prices and has no volume. Bid values are not assumed to match a TradingView feed, and the one-day-range sample is not sufficient for strategy validation.
 
 ### Impulse (Candidate)
 
