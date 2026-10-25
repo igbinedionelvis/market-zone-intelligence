@@ -11,3 +11,7 @@ class CsvLoadError(MarketDataError):
 
 class CandleValidationError(MarketDataError):
     """Raised when parsed candles violate timestamp or OHLC rules."""
+
+
+class DatasetValidationError(MarketDataError):
+    """Raised when dataset-level validation cannot run on the given inputs."""
