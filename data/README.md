@@ -28,6 +28,24 @@ This file is a short historical extract (2025-01-06 through 2025-01-07). It is s
 
 Ingestion lives in `backend/app/data/`: read the caller-supplied path, require the exact columns above, convert timestamps to timezone-aware UTC, and validate OHLC invariants. The loader does not sort, deduplicate, or inject symbol, timeframe, or volume onto candle records. Optional timeframe alignment is applied only when the caller passes an explicit timeframe.
 
+## Dataset inventory CLI
+
+From the repository root, using the backend virtual environment:
+
+```bash
+backend/.venv/bin/python backend/scripts/validate_historical_ohlc.py
+```
+
+Windows:
+
+```bash
+backend\.venv\Scripts\python.exe backend\scripts\validate_historical_ohlc.py
+```
+
+The script scans `data/raw/` for `eurusd-m15-bid-YYYY-MM-DD-YYYY-MM-DD.csv`, excludes the overlapping one-day sample `eurusd-m15-bid-2025-01-06-2025-01-07.csv` by filename, and runs `validate_ohlc_dataset` with a 15-minute timeframe. It does not rewrite source files.
+
+Exit code 0 means there were matching expanded files and no load errors, duplicate timestamps, overlapping ranges, or out-of-order candles. Reported gaps do not fail the run. Use `--raw-dir` to scan a different directory.
+
 ## Conventions
 
 - Use descriptive filenames (instrument, timeframe, price type, and date range)
