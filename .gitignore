@@ -69,3 +69,5 @@ research/experiments/**/outputs/
 # Logs
 *.log
 logs/
+
+data/backup/
