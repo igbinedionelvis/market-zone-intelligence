@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "dukascopy-node": "^1.51.1"
+  },
+  "scripts": {
+    "download:history": "node scripts/download-history.js"
+  }
+}
